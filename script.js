@@ -13,7 +13,31 @@ async function carregarAtalhos() {
   dados.forEach(({ sistema, codigo, descricao }) => {
     const el = document.createElement("div");
     el.className = "atalho";
-    el.textContent = `${codigo} - ${descricao}`;
+    
+    // Cria o texto do atalho
+    const textoAtalho = document.createElement("span");
+    textoAtalho.className = "texto-atalho";
+    textoAtalho.textContent = `${codigo} - ${descricao}`;
+    
+    // Cria o botão de cópia
+    const botaoCopia = document.createElement("button");
+    botaoCopia.className = "botao-copiar";
+    botaoCopia.innerHTML = "📋"; // Ou use um ícone ou texto "Copiar"
+    botaoCopia.title = "Copiar código";
+    botaoCopia.addEventListener("click", () => {
+      navigator.clipboard.writeText(codigo).then(() => {
+        // Feedback visual temporário
+        botaoCopia.textContent = "✔";
+        setTimeout(() => {
+          botaoCopia.innerHTML = "📋";
+        }, 2000);
+      });
+    });
+    
+    // Adiciona ambos ao elemento do atalho
+    el.appendChild(textoAtalho);
+    el.appendChild(botaoCopia);
+    
     if (sistema.toLowerCase() === "brudam") {
       listaBrudam.appendChild(el);
     } else if (sistema.toLowerCase() === "ssw") {
