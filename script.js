@@ -24,15 +24,21 @@ async function carregarAtalhos() {
     botaoCopia.className = "botao-copiar";
     botaoCopia.innerHTML = "📋"; // Ou use um ícone ou texto "Copiar"
     botaoCopia.title = "Copiar código";
-    botaoCopia.addEventListener("click", () => {
-      navigator.clipboard.writeText(codigo).then(() => {
-        // Feedback visual temporário
-        botaoCopia.textContent = "✔";
-        setTimeout(() => {
-          botaoCopia.innerHTML = "📋";
-        }, 2000);
-      });
-    });
+   botaoCopia.addEventListener("click", () => {
+  navigator.clipboard.writeText(codigo).then(() => {
+    const originalContent = botaoCopia.innerHTML;
+    botaoCopia.innerHTML = "Copiado!";
+    botaoCopia.style.color = "var(--accent)";
+    
+    setTimeout(() => {
+      botaoCopia.innerHTML = originalContent;
+      botaoCopia.style.color = "";
+    }, 1500);
+  }).catch(err => {
+    console.error("Falha ao copiar: ", err);
+    botaoCopia.textContent = "Erro";
+  });
+});
     
     // Adiciona ambos ao elemento do atalho
     el.appendChild(textoAtalho);
