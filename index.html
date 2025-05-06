@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Atalhos - Brudam e SSW</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Atalhos de Sistemas</h1>
+
+  <div class="container">
+    <div class="coluna" id="brudam">
+      <h2>Brudam</h2>
+      <div id="lista-brudam"></div>
+    </div>
+    <div class="coluna" id="ssw">
+      <h2>SSW</h2>
+      <div id="lista-ssw"></div>
+    </div>
+  </div>
+
+  <form id="form-atalho">
+    <h3>Adicionar novo atalho</h3>
+    <select name="sistema" required>
+      <option value="">Selecione o sistema</option>
+      <option value="brudam">Brudam</option>
+      <option value="ssw">SSW</option>
+    </select>
+    <input type="text" name="codigo" placeholder="Código do atalho" required />
+    <input type="text" name="descricao" placeholder="Descrição do atalho" required />
+    <button type="submit">Adicionar</button>
+  </form>
+  <script src="script.js"></script>
+</body>
+</html>
