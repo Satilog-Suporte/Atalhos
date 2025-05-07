@@ -333,3 +333,7 @@ button:active {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-hover);
 }
+
+button.loading { background-color: #ffb347; }
+button.success { background-color: #4CAF50; }
+button.error { background-color: #f44336; }
