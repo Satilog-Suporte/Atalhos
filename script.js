@@ -1,77 +1,64 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbybMEZsRH6-2cFDdbUgs3JnCA2WvCxApBaSDFlFxsQnoPYZ1OhXECG1af8e6xelw5pM/exec";
+let isOnline = true;
 
-async function carregarAtalhos() {
-  const res = await fetch(API_URL);
-  const dados = await res.json();
+async function handleSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const button = form.querySelector("button");
+  
+  try {
+    // Obter e validar dados
+    const formData = {
+      sistema: form.sistema.value.trim().toLowerCase(),
+      codigo: form.codigo.value.trim(),
+      descricao: form.descricao.value.trim()
+    };
 
-  const listaBrudam = document.getElementById("lista-brudam");
-  const listaSSW = document.getElementById("lista-ssw");
-
-  listaBrudam.innerHTML = "";
-  listaSSW.innerHTML = "";
-
-  dados.forEach(({ sistema, codigo, descricao }) => {
-    const el = document.createElement("div");
-    el.className = "atalho";
-    
-    // Cria o texto do atalho
-    const textoAtalho = document.createElement("span");
-    textoAtalho.className = "texto-atalho";
-    textoAtalho.textContent = `${codigo} - ${descricao}`;
-    
-    // Cria o botão de cópia
-    const botaoCopia = document.createElement("button");
-    botaoCopia.className = "botao-copiar";
-    botaoCopia.innerHTML = "📋"; // Ou use um ícone ou texto "Copiar"
-    botaoCopia.title = "Copiar código";
-   botaoCopia.addEventListener("click", () => {
-  navigator.clipboard.writeText(codigo).then(() => {
-    const originalContent = botaoCopia.innerHTML;
-    botaoCopia.innerHTML = "Copiado!";
-    botaoCopia.style.color = "var(--accent)";
-    
-    setTimeout(() => {
-      botaoCopia.innerHTML = originalContent;
-      botaoCopia.style.color = "";
-    }, 1500);
-  }).catch(err => {
-    console.error("Falha ao copiar: ", err);
-    botaoCopia.textContent = "Erro";
-  });
-});
-    
-    // Adiciona ambos ao elemento do atalho
-    el.appendChild(textoAtalho);
-    el.appendChild(botaoCopia);
-    
-    if (sistema.toLowerCase() === "brudam") {
-      listaBrudam.appendChild(el);
-    } else if (sistema.toLowerCase() === "ssw") {
-      listaSSW.appendChild(el);
+    if (!formData.sistema || !formData.codigo || !formData.descricao) {
+      showFeedback(button, "Preencha todos campos!", "error");
+      return;
     }
-  });
+
+    // Enviar dados
+    showFeedback(button, "Enviando...", "loading");
+    
+    if (isOnline) {
+      await sendToAPI(formData);
+    } else {
+      await saveLocal(formData);
+    }
+
+    // Sucesso
+    form.reset();
+    await carregarAtalhos();
+    showFeedback(button, "Adicionado!", "success");
+    
+  } catch (error) {
+    console.error("Erro:", error);
+    showFeedback(button, "Erro ao enviar", "error");
+    isOnline = false; // Tenta modo offline
+  }
 }
 
-document.getElementById("form-atalho").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const form = e.target;
-  const sistema = form.sistema.value.trim().toLowerCase();
-  const codigo = form.codigo.value.trim();
-  const descricao = form.descricao.value.trim();
-
-  if (!sistema || !codigo || !descricao) return;
-
-  const body = { sistema, codigo, descricao };
-
-  await fetch(API_URL, {
+// Funções auxiliares
+async function sendToAPI(data) {
+  const response = await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify(body),
-    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" }
   });
+  if (!response.ok) throw new Error("API failed");
+}
 
-  form.reset();
-  carregarAtalhos();
-});
+function showFeedback(button, text, type) {
+  button.textContent = text;
+  button.className = type; // Adicione estilos CSS para .loading, .success, .error
+  setTimeout(() => {
+    button.textContent = "Adicionar";
+    button.className = "";
+  }, 2000);
+}
 
+// Inicialização
+document.getElementById("form-atalho").addEventListener("submit", handleSubmit);
 carregarAtalhos();
